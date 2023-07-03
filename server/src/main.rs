@@ -15,6 +15,11 @@ use rocket::{
     State,
 };
 
+// CORS
+use rocket::{Request, Response,
+            http::Header,
+            fairing::{Fairing, Info, Kind}};
+
 #[derive(Debug, Serialize, Deserialize)]
 struct UserAddress {
     address: String,
@@ -254,14 +259,47 @@ async fn rocket() -> _ {
     let app_state = AppState { col: collection };
 
     // Build the Rocket application
-    rocket::build().manage(app_state).mount(
+    rocket::build().manage(app_state)
+        .attach(Cors) // CORS
+        .mount(
         "/",
         routes![
             hello,
             wipe_database,
             retrieve_user,
             update_task,
-            append_task
+            append_task,
+            all_options // CORS
         ],
     )
+}
+
+// CORS
+
+pub struct Cors;
+
+// Catches all OPTION requests in order to get the CORS related Fairing triggered.
+#[options("/<_..>")]
+fn all_options() {
+    /* Intentionally left empty */
+}
+
+#[rocket::async_trait]
+impl Fairing for Cors {
+    fn info(&self) -> Info {
+        Info {
+            name: "Cross-Origin-Resource-Sharing Fairing",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new(
+            "Access-Control-Allow-Methods",
+            "POST, PATCH, PUT, DELETE, HEAD, OPTIONS, GET",
+        ));
+        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+    }
 }
