@@ -230,13 +230,15 @@ async fn rocket() -> _ {
     // Load environment variables from .env file
     dotenv().ok();
 
-    // Retrieve MongoDB URI from environment variable
+    // Retrieve configuration values from environment variables
     let mongodb_uri = std::env::var("MONGODB_URI").expect("Error loading MongoDB URI");
+    let database_name = std::env::var("DB_NAME").expect("Error loading DB Name");
+    let collection_name = std::env::var("COLLECTION_NAME").expect("Error loading Collection Name");
 
     // Create a MongoDB client and connect to the specified database and collection
     let client = Client::with_uri_str(&mongodb_uri).unwrap();
-    let database = client.database("DB1");
-    let collection: Collection<Document> = database.collection("todoapp");
+    let database = client.database(database_name);
+    let collection: Collection<Document> = database.collection(collection_name);
 
     // Create the application state
     let app_state = AppState { col: collection };
