@@ -70,7 +70,17 @@ async fn retrieve_user(
     match mongo.col.find_one(query, None) {
         Ok(Some(record)) => {
             // User found, return the user document as a JSON string
-            let json_string = record.to_string();
+
+            // Exclude the "_id" field from the record document
+            let mut user_doc = Document::new();
+            for (key, value) in record {
+                if key != "_id" {
+                    user_doc.insert(key, value);
+                }
+            }
+
+            // Serialize the new document as a JSON string
+            let json_string = user_doc.to_string();
             Ok(Json(json_string))
         }
         Ok(None) => {
@@ -237,8 +247,8 @@ async fn rocket() -> _ {
 
     // Create a MongoDB client and connect to the specified database and collection
     let client = Client::with_uri_str(&mongodb_uri).unwrap();
-    let database = client.database(database_name);
-    let collection: Collection<Document> = database.collection(collection_name);
+    let database = client.database(&database_name);
+    let collection: Collection<Document> = database.collection(&collection_name);
 
     // Create the application state
     let app_state = AppState { col: collection };
