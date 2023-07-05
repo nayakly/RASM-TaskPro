@@ -48,3 +48,4 @@ npm run dev
 ```
 
 Make sure you have [Metamask](https://metamask.io/) installed and listen to `Goerli` to interact with the dapp. If things go well, you should see this on your screen. 
+![Recording](https://github.com/nayakly/RASM-TodoList/assets/112154673/dde0e5f3-4062-40ec-8cd6-2dd9fc94a4b3)
