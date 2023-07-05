@@ -220,7 +220,7 @@ async fn append_task(create_task: Json<TaskUpdate>, mongo: &State<AppState>) -> 
         "taskName": task_name,
         "checked": checked,
         "deleted": deleted,
-        "disabled": false
+        "disabled": true
     };
 
     // Create the update document to push the new task to the data array
